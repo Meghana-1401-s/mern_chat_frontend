@@ -236,13 +236,13 @@ export default function LandingPage() {
                 overflowY="auto"
               >
                 <ChatMessage
-                  sender="Sarah"
+                  sender="Sarah Chen"
                   message="Hey team! Just pushed the new updates to staging."
                   time="10:30 AM"
                   isUser={false}
                 />
                 <ChatMessage
-                  sender="Alex"
+                  sender="Alex Thompson"
                   message="Great work! The new features look amazing 🚀"
                   time="10:31 AM"
                   isUser={false}

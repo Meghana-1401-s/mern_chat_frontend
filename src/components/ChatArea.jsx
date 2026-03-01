@@ -17,6 +17,7 @@ import UsersList from "./UsersList";
 import { useRef, useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
+import apiURL from "../../utils";
 
 const ChatArea = ({ selectedGroup, socket, setSelectedGroup }) => {
   console.log(selectedGroup?._id);
@@ -30,7 +31,7 @@ const ChatArea = ({ selectedGroup, socket, setSelectedGroup }) => {
   const typingTimeoutRef = useRef(null);
   const toast = useToast();
 
-  const currentUser = JSON.parse(localStorage.getItem("userInfo"));
+  const currentUser = JSON.parse(localStorage.getItem("userInfo") || {});
 
   useEffect(() => {
     if (selectedGroup && socket) {
@@ -97,7 +98,7 @@ const ChatArea = ({ selectedGroup, socket, setSelectedGroup }) => {
     const token = currentUser?.token;
     try {
       const { data } = await axios.get(
-        `http://localhost:5001/api/messages/${selectedGroup?._id}`,
+        `${apiURL}/api/messages/${selectedGroup?._id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -116,7 +117,7 @@ const ChatArea = ({ selectedGroup, socket, setSelectedGroup }) => {
     try {
       const token = currentUser.token;
       const { data } = await axios.post(
-        `http://localhost:5001/api/messages`,
+        `${apiURL}/api/messages`,
         {
           content: newMessage,
           groupId: selectedGroup?._id,

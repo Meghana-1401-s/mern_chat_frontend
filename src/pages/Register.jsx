@@ -12,34 +12,33 @@ import axios from "axios";
 import { useState } from "react";
 
 import { Link, useNavigate } from "react-router-dom";
+import apiURL from "../../utils";
 
 const Register = () => {
-  const [email, setEmail ] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [loading, setLoading] = useState("");
+  const [loading, setLoading] = useState(false);
   const toast = useToast();
+  //Navigate
   const navigate = useNavigate();
-  //handle submit (login)
+  //main logic for login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    try{
-      const {data} = await axios.post(
-        "http://localhost:5001/api/users/register", 
-      {
+    try {
+      const { data } = await axios.post(`${apiURL}/api/users/register`, {
         email,
         password,
         username,
-      }
-    );
-    console.log(data.user);
+      });
+      console.log(data.user);
 
       navigate("/login");
     } catch (error) {
-      toast ({
-        title:"Error",
-        description: error.response.data.message || "An error occured",
+      toast({
+        title: "Error",
+        description: error.response.data.message || "An error occurred",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -119,7 +118,7 @@ const Register = () => {
               </FormLabel>
               <Input
                 value={username}
-                onChange={(e)=> setUsername(e.target.value)}
+                onChange={(e) => setUsername(e.target.value)}
                 type="text"
                 size="lg"
                 bg="gray.50"
@@ -135,8 +134,8 @@ const Register = () => {
                 Email
               </FormLabel>
               <Input
-              value={email}
-                onChange={(e)=> setEmail(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 size="lg"
                 bg="gray.50"
@@ -152,8 +151,8 @@ const Register = () => {
                 Password
               </FormLabel>
               <Input
-              value={password}
-                onChange={(e)=> setPassword(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 size="lg"
                 bg="gray.50"

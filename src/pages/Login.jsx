@@ -12,33 +12,35 @@ import { Link, useNavigate } from "react-router-dom";
 import { FiLogIn } from "react-icons/fi";
 import { useState } from "react";
 import axios from "axios";
+import apiURL from "../../utils";
 
 const Login = () => {
-  const [email, setEmail ] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState("");
+  const [loading, setLoading] = useState(false);
   const toast = useToast();
+  //Navigate
   const navigate = useNavigate();
-  //handle submit (login)
+  //main logic for login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    try{
-      const {data} = await axios.post(
-        "http://localhost:5001/api/users/login", 
-      {
+    try {
+      const { data } = await axios.post(`${apiURL}/api/users/login`, {
         email,
         password,
-      }
-    );
-    console.log(data.user);
-  //save the token into localstorage
+      });
+      console.log(data.user);
+
+      //save the token into localstorage
       localStorage.setItem("userInfo", JSON.stringify(data.user));
       navigate("/chat");
     } catch (error) {
-      toast ({
-        title:"Error",
-        description: error.response.data.message || "An error occured",
+      console.log(error);
+
+      toast({
+        title: "Error",
+        description: error.response.data.message || "An error occurred",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -125,13 +127,13 @@ const Login = () => {
               <Input
                 type="email"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 size="lg"
                 bg="gray.50"
                 borderColor="gray.200"
                 _hover={{ borderColor: "blue.500" }}
                 _focus={{ borderColor: "blue.500" }}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
               />
             </FormControl>
 
@@ -144,22 +146,22 @@ const Login = () => {
                 placeholder="Enter your password"
                 size="lg"
                 bg="gray.50"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 borderColor="gray.200"
                 _hover={{ borderColor: "blue.500" }}
                 _focus={{ borderColor: "blue.500" }}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
               />
             </FormControl>
 
             <Button
               onClick={handleSubmit}
               isLoading={loading}
-                colorScheme="blue"
-                width="100%"
-                size="lg"
-                fontSize="md"
-                leftIcon={<FiLogIn />}
+              colorScheme="blue"
+              width="100%"
+              size="lg"
+              fontSize="md"
+              leftIcon={!loading && <FiLogIn />}
             >
               Sign In
             </Button>

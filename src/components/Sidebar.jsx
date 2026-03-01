@@ -23,14 +23,16 @@ import { useEffect, useState } from "react";
 import { FiLogOut, FiPlus, FiUsers } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-const Sidebar = ({setSelectedGroup}) => {
+import apiURL from "../../utils";
+
+const Sidebar = ({ setSelectedGroup }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [newGroupName, setNewGroupName] = useState("");
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]);
   const [newGroupDescription, setNewGroupDescription] = useState("");
-  const toast = useToast();
   const [isAdmin, setIsAdmin] = useState(false);
+  const toast = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,12 +45,13 @@ const Sidebar = ({setSelectedGroup}) => {
     //!update admin status
     setIsAdmin(userInfo?.isAdmin || false);
   };
+
   //fetch all groups
   const fetchGroups = async () => {
     try {
       const userInfo = JSON.parse(localStorage.getItem("userInfo") || {});
       const token = userInfo.token;
-      const { data } = await axios.get("http://localhost:5001/api/groups", {
+      const { data } = await axios.get(`${apiURL}/api/groups`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -67,13 +70,13 @@ const Sidebar = ({setSelectedGroup}) => {
       console.log(error);
     }
   };
-  //create groups
+  //Create  groups
   const handleCreateGroup = async () => {
     try {
       const userInfo = JSON.parse(localStorage.getItem("userInfo") || {});
       const token = userInfo.token;
       await axios.post(
-        `http://localhost:5001/api/groups`,
+        `${apiURL}/api/groups`,
         {
           name: newGroupName,
           description: newGroupDescription,
@@ -104,7 +107,6 @@ const Sidebar = ({setSelectedGroup}) => {
       });
     }
   };
-
   //logout
   const handleLogout = () => {
     localStorage.removeItem("userInfo");
@@ -116,7 +118,7 @@ const Sidebar = ({setSelectedGroup}) => {
       const userInfo = JSON.parse(localStorage.getItem("userInfo") || {});
       const token = userInfo.token;
       await axios.post(
-        `http://localhost:5001/api/groups/${groupId}/join`,
+        `${apiURL}/api/groups/${groupId}/join`,
         {},
         {
           headers: {
@@ -149,7 +151,7 @@ const Sidebar = ({setSelectedGroup}) => {
       const userInfo = JSON.parse(localStorage.getItem("userInfo") || {});
       const token = userInfo.token;
       await axios.post(
-        `http://localhost:5001/api/groups/${groupId}/leave`,
+        `${apiURL}/api/groups/${groupId}/leave`,
         {},
         {
           headers: {
@@ -176,34 +178,14 @@ const Sidebar = ({setSelectedGroup}) => {
     }
   };
   // Sample groups data
-  // const groups = [
-  //   {
-  //     id: 1,
-  //     name: "Development Team",
-  //     description: "Main development team channel for daily updates",
-  //     isJoined: true,
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Design Team",
-  //     description: "Collaboration space for designers",
-  //     isJoined: false,
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Marketing",
-  //     description: "Marketing team discussions and campaigns",
-  //     isJoined: true,
-  //   },
-  // ];
 
   return (
     <Box
-      h="100%"
+      h={{ base: "calc(100vh - 60px)", md: "100%" }}
       bg="white"
       borderRight="1px"
       borderColor="gray.200"
-      width="300px"
+      width={{ base: "100%", md: "300px" }}
       display="flex"
       flexDirection="column"
     >
@@ -240,17 +222,19 @@ const Sidebar = ({setSelectedGroup}) => {
         )}
       </Flex>
 
-      <Box flex="1" overflowY="auto" p={4} mb={16}>
+      <Box flex="1" overflowY="auto" p={4} mb={{ base: 20, md: 16 }}>
         <VStack spacing={3} align="stretch">
           {groups.map((group) => (
             <Box
-              key={group.id}
+              key={group._id}
               p={4}
               cursor="pointer"
               borderRadius="lg"
               bg={userGroups.includes(group?._id) ? "blue.50" : "gray.50"}
               borderWidth="1px"
-              borderColor={userGroups.includes(group?._id) ? "blue.200" : "gray.200"}
+              borderColor={
+                userGroups.includes(group?._id) ? "blue.200" : "gray.200"
+              }
               transition="all 0.2s"
               _hover={{
                 transform: "translateY(-2px)",
@@ -259,9 +243,7 @@ const Sidebar = ({setSelectedGroup}) => {
               }}
             >
               <Flex justify="space-between" align="center">
-                <Box onClick={
-                  ()=> userGroups.includes(group?._id) && setSelectedGroup(group)
-                } flex="1">
+                <Box onClick={() => setSelectedGroup(group)} flex="1">
                   <Flex align="center" mb={2}>
                     <Text fontWeight="bold" color="gray.800">
                       {group.name}
@@ -278,13 +260,15 @@ const Sidebar = ({setSelectedGroup}) => {
                 </Box>
                 <Button
                   size="sm"
-                  colorScheme={userGroups?.includes(group?._id) ? "red" : "blue"}
+                  colorScheme={
+                    userGroups?.includes(group?._id) ? "red" : "blue"
+                  }
                   variant={userGroups?.includes(group?._id) ? "ghost" : "solid"}
                   ml={3}
-                  onClick={()=>{
-                    userGroups?.includes(group?._id) 
-                    ? handleLeaveGroup(group?._id)
-                    : handleJoinGroup(group?._id);
+                  onClick={() => {
+                    userGroups?.includes(group?._id)
+                      ? handleLeaveGroup(group?._id)
+                      : handleJoinGroup(group?._id);
                   }}
                   _hover={{
                     transform: group.isJoined ? "scale(1.05)" : "none",
@@ -311,13 +295,14 @@ const Sidebar = ({setSelectedGroup}) => {
         borderTop="1px solid"
         borderColor="gray.200"
         bg="gray.50"
-        position="absolute"
+        position="fixed"
         bottom={0}
         left={0}
         right={0}
-        width="100%"
+        width={{ base: "100%", md: "300px" }}
+        zIndex={2}
       >
-        <Button 
+        <Button
           variant="ghost"
           onClick={handleLogout}
           colorScheme="red"
@@ -364,7 +349,7 @@ const Sidebar = ({setSelectedGroup}) => {
               mr={3}
               mt={4}
               width="full"
-              onClick={() => handleCreateGroup()}
+              onClick={handleCreateGroup}
             >
               Create Group
             </Button>
